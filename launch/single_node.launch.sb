@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
 <launch>
     <!-- Common Interface -->
-    <arg name="device" default="26804026"/>
+    <arg name="device"/>
     <arg name="rate" default="20"/>
 
     <!-- Camera Settings -->
@@ -13,8 +12,8 @@
     <arg name="fps" default="$(arg rate)"/>
 
     <arg name="idpf" default="0"/>
-    <arg name="aec" default="false"/>
-    <arg name="expose_us" default="70000"/>
+    <arg name="aec" default="true"/>
+    <arg name="expose_us" default="10000"/>
     <arg name="agc" default="true"/>
     <arg name="gain_db" default="0.0"/>
     <arg name="cbm" default="0"/>
@@ -28,18 +27,11 @@
 
     <!-- Node Settings -->
     <arg name="output" default="screen"/>
-    <arg name="proc" default="true"/>
+    <arg name="proc" default="false"/>
     <arg name="view" default="false"/>
     <arg name="calib" default="false"/>
-    <arg name="goalDetected" default="true"/>
-    <arg name="trajectorygenerator" default="true"/>
 
     <!-- Node -->
-    <include file="$(find dji_sdk)/launch/sdk_manifold.launch"/>
-	<node pkg="dji_sdk_demo" type="dji_sdk_client" name="dji_sdk_client" output="screen">
-	</node>
-
-
     <node pkg="bluefox2" type="bluefox2_single_node" name="$(arg camera)" output="$(arg output)">
         <param name="identifier" type="string" value="$(arg serial)"/>
         <param name="frame_id" type="string" value="$(arg frame_id)"/>
@@ -64,11 +56,10 @@
     <!-- Proc -->
     <node if="$(arg proc)"
         pkg="image_proc" type="image_proc" name="image_proc" ns="$(arg camera)">
-	
     </node>
 
     <!-- View -->
-    <arg name="image" default="image_rect_color"/>
+    <arg name="image" default="image_raw"/>
     <node if="$(arg view)"
         pkg="image_view" type="image_view" name="viewer" ns="$(arg camera)"
         args="image:=$(arg image)" output="$(arg output)">
@@ -87,13 +78,4 @@
             image:=/$(arg camera)/image_raw camera:=/$(arg camera)">
         </node>
     </group>
-
-    <node if="$(arg goalDetected)" 
-	pkg="goal_detected" type="goal_detected" name="goal_detected" output="screen">
-    </node>
-
-    <node if="$(arg trajectorygenerator)" 
-	pkg="trajectorygenerator" type="trajectorygenerator_node" name="trajectorygenerator" output="screen">
-    </node>
-
 </launch>
